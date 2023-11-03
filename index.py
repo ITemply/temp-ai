@@ -8,7 +8,7 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-  if requets.method == 'GET':
+  if request.method == 'GET':
     return render_template('login.html')
   elif request.method == 'POST':
     return 'posted'
