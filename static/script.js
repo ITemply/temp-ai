@@ -9,7 +9,12 @@ async function log(datatype, collectdata) {
       body: JSON.stringify(sendinglogdata),
       cache: 'default'
     })
-    alert(senddata.JSON)
+    const respondjson = await senddata.json()
+    const newjson = JSON.stringify(respondjson)
+    const newstatus = JSON.parse(newjson)
+    const information = newstatus.response
+
+    alert(information)
   } catch (error) {
     console.error("Error:", error);
   }
