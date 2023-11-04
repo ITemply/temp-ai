@@ -9,7 +9,7 @@ async function log(datatype, collectdata) {
       body: JSON.stringify(sendinglogdata),
       cache: 'default'
     })
-    alert(senddata)
+    alert(senddata.JSON)
   } catch (error) {
     console.error("Error:", error);
   }
