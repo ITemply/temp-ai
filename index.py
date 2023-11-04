@@ -11,7 +11,7 @@ def login():
   if request.method == 'GET':
     return render_template('login.html')
   elif request.method == 'POST':
-    return '{"response": "posted"}'
+    return '{"response": "posted new"}'
   else:
     return 'requets type not availibe'
 
