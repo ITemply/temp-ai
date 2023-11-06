@@ -1,3 +1,5 @@
+import harperdb
+
 from flask import Flask, request, render_template, redirect, abort
 
 app = Flask(__name__)
