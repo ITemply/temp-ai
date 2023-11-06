@@ -22,7 +22,6 @@ def executeSQL(SQLData):
   }
 
   response = requests.request("POST", url, headers=headers, data=payload)
-  print(response.json)
   return response
 
 @app.route('/', methods=['GET', 'POST'])
