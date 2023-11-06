@@ -1,1 +1,3 @@
 Flask==3.0.0
+harperdb==0.4.2
+python-dotenv==0.15.0
