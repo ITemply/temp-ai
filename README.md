@@ -1,4 +1,4 @@
-<p allign="center">
+<p align="center">
   <h1>temp-ai</h1>
   <span>small ai thingy im gonna make cuz im bored</span>
   <br><br>
