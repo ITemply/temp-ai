@@ -1,8 +1,13 @@
-import harperdb
+import harperdb, os
 
 from flask import Flask, request, render_template, redirect, abort
 
 app = Flask(__name__)
+
+from dotenv import load_dotenv
+load_dotenv()
+
+db = harperdb.HarperDB(url=os.environ["DB_URL"], username=os.environ["DB_USER"], password=os.environ["DB_PASSWORD"])
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
