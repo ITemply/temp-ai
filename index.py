@@ -27,16 +27,16 @@ def executeSQL(SQLData):
 def index():
   return render_template('index.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/signup', methods=['GET', 'POST'])
 def login():
   if request.method == 'GET':
-    return render_template('login.html')
+    return render_template('signup.html')
   elif request.method == 'POST':
     jsonData = request.get_json(force=True)
     username = jsonData['username']
     password = jsonData['password']
     executeSQL(f"INSERT INTO accounts.accountData (username, password) VALUE ('{username}', '{password}')")
-    return '{"response": "posted new"}'
+    return '{"response": "Signed Up"}'
   else:
     return 'requets type not availibe'
 

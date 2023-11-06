@@ -4,7 +4,7 @@ async function log(datatype, collectdata) {
   const sendinglogdata = {username: 'Temply', password: 'TemplyPassword'}
 
   try {
-    const senddata = await fetch('/login', {
+    const senddata = await fetch('/signup', {
       method: 'POST',
       body: JSON.stringify(sendinglogdata),
       cache: 'default'
