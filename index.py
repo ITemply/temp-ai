@@ -1,4 +1,4 @@
-import harperdb, os, json, requests, base64
+import harperdb, os, json, requests
 
 from flask import Flask, request, render_template, redirect, abort
 
