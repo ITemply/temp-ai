@@ -1,7 +1,7 @@
 console.log('hello world')
 
 async function log(datatype, collectdata) {
-  const sendinglogdata = {username: 'Temply', password: 'TempylPassword'}
+  const sendinglogdata = {username: 'Temply', password: 'TemplyPassword'}
 
   try {
     const senddata = await fetch('/login', {
