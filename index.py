@@ -1,4 +1,4 @@
-import harperdb, os, json
+import harperdb, os, json, requests, base64
 
 from flask import Flask, request, render_template, redirect, abort
 
@@ -7,25 +7,23 @@ app = Flask(__name__)
 from dotenv import load_dotenv
 load_dotenv()
 
-schema = f"book_repo"
+def executeSQL(SQLData):
+  url = os.environ['DB_URL']
 
-db = harperdb.HarperDB(url=os.environ["DB_URL"], username=os.environ["DB_USER"], password=os.environ["DB_PASSWORD"])
+  payload = json.dumps({
+    "operation": "sql",
+    "sql": SQLData
+  })
 
-class BookModel:
-    def create(self, book_list):
-        return db.insert(schema, 'books', book_list)
-    
-    def update(self, book_list):
-        return db.update(schema, 'books', book_list)
+  headers = {
+    'Content-Type': 'application/json',
+    "authorization": "Basic " + os.environ['DB_AUTH'],
+    "cache-control": "no-cache"
+  }
 
-    def delete(self, id):
-        return db.delete(schema, 'books', [id])
-    
-    def get(self, id):
-        return db.search_by_hash(schema, 'books', [id], get_attributes=['*'])
-
-    def get_all(self):
-        return db.sql(f"select book_name, author, pages from {schema}.{'books'}")
+  response = requests.request("POST", url, headers=headers, data=payload)
+  print(response.json)
+  return response
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -36,8 +34,10 @@ def login():
   if request.method == 'GET':
     return render_template('login.html')
   elif request.method == 'POST':
-    print(request.get_json(force=True))
-    BookModel.create(schema, json.loads(str(request.get_json())))
+    jsonData = request.get_json(force=True)
+    username = jsonData['username']
+    password = jsonData['password']
+    executeSQL(f"INSERT INTO accounts.accountData (username, password) VALUE ('{username}', '{password}')")
     return '{"response": "posted new"}'
   else:
     return 'requets type not availibe'
