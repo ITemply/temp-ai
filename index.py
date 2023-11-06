@@ -21,8 +21,7 @@ def executeSQL(SQLData):
     "cache-control": "no-cache"
   }
 
-  response = requests.request("POST", url, headers=headers, data=payload)
-  return response
+  requests.request("POST", url, headers=headers, data=payload)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
