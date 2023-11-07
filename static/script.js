@@ -1,7 +1,8 @@
-console.log('hello world')
+async function createAccount() {
+  const accountUsername = document.getElementById('username').value
+  const accountPassword = document.getElementById('password').value
 
-async function log(datatype, collectdata) {
-  const sendinglogdata = {username: 'Temply', password: 'TemplyPassword', status: 'User'}
+  const sendinglogdata = {username: accountUsername, password: accountPassword, status: 'User'}
 
   try {
     const senddata = await fetch('/signup', {
