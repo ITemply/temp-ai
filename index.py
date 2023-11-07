@@ -53,6 +53,7 @@ def login():
     username = jsonData['username']
     password = jsonData['password']
     encodedPassword = encodestring(password)
+    print(jsonData)
     status = jsonData['status']
     executeSQL(f"INSERT INTO accounts.accountData (username, password, status) VALUE ('{username}', '{encodedPassword}', '{status}')")
     return '{"response": "Signed Up"}'
