@@ -1,4 +1,5 @@
 async function createAccount() {
+  alert('started')
   const accountUsername = document.getElementById('username').value
   const accountPassword = document.getElementById('password').value
 
