@@ -1,4 +1,4 @@
-import harperdb, os, json, requests
+import os, json, requests
 
 from flask import Flask, request, render_template, redirect, abort
 
@@ -35,7 +35,8 @@ def login():
     jsonData = request.get_json(force=True)
     username = jsonData['username']
     password = jsonData['password']
-    executeSQL(f"INSERT INTO accounts.accountData (username, password) VALUE ('{username}', '{password}')")
+    status = jsonData['status']
+    executeSQL(f"INSERT INTO accounts.accountData (username, password, status) VALUE ('{username}', '{password}', '{status}')")
     return '{"response": "Signed Up"}'
   else:
     return 'requets type not availibe'
