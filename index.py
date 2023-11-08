@@ -25,7 +25,7 @@ def checkUsername(username):
     else:
       return False
   
-  find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkUsername="{newUsername.lower()}"')
+  find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{newUsername.lower()}"')
   if not find.json():
     return True
   else:
