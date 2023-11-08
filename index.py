@@ -25,7 +25,7 @@ def checkUsername(username):
     else:
       return False
   
-  find = executeSQL(f'SELECT * FROM accounts.accountData WHERE username="{newUsername}"')
+  find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkUsername="{newUsername.lower()}"')
   if not find.json():
     return True
   else:
@@ -71,7 +71,7 @@ def login():
       userid =  getUserId()
       password = jsonData['password']
       encodedPassword = encodestring(password)
-      executeSQL(f"INSERT INTO accounts.accountData (username, password, userid, status) VALUE ('{username}', '{encodedPassword}', {userid}, 'User')")
+      executeSQL(f"INSERT INTO accounts.accountData (username, checkusername, password, userid, status) VALUE ('{username}', '{username.lower()}', '{encodedPassword}', {userid}, 'User')")
       return '{"response": "Signed Up"}'
     else:
       return '{"response": "ACF"}'
