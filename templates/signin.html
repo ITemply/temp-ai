@@ -4,20 +4,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>Temp AI</title>
+  <title>Temp AI - Sign In</title>
   <link href="static/style.css" rel="stylesheet" type="text/css" />
   <link rel='icon' type='image/x-icon' href='static/images/telux.png'>
 </head>
 
 <script src="static/script.js"></script>
   
-<body onload='log()'>
+<body>
   <center>
-    <h1>Temp AI</h1>
-    <p>little project that i gave a random name (gonna change it later)</p>
-    <input type="button" value="Sign Up" onclick="window.location.href='/signup'">
+    <h1>Sign In</h1>
+    <input type="text" id="username" placeholder="username">
     <br>
-    <input type="button" value="Sign In" onclick="window.location.href='/signin'">
+    <input type="password" id="password" placeholder="password">
+    <br>
+    <input type="button" id="signup" onclick="signIn()" value="Sign In">
+    <span class='error' id="error"></span>
   </center>
 </body>
   

@@ -23,13 +23,13 @@ def checkUsername(username):
     if listUsername[uChar] in validChars:
       pass
     else:
-      return False
+      return 'Invalid Username'
   
   find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{newUsername.lower()}"')
   if not find.json():
-    return True
+    return 'Accept'
   else:
-    return False
+    return 'Taken'
 
 def getUserId():
   find = executeSQL(f'SELECT * FROM accounts.accountCount')
@@ -67,12 +67,16 @@ def login():
   elif request.method == 'POST':
     jsonData = request.get_json(force=True)
     username = jsonData['username']
-    if checkUsername(username):
+    if checkUsername(username) == 'Accept':
       userid =  getUserId()
       password = jsonData['password']
       encodedPassword = encodestring(password)
       executeSQL(f"INSERT INTO accounts.accountData (username, checkusername, password, userid, status) VALUE ('{username}', '{username.lower()}', '{encodedPassword}', {userid}, 'User')")
       return '{"response": "Signed Up"}'
+    elif checkUsername(username) == 'Invalid Username':
+      return '{"response": "IA"}'
+    elif checkUsername(username) == 'Taken':
+      return '{"response": "T"}'
     else:
       return '{"response": "ACF"}'
   else:
@@ -80,7 +84,12 @@ def login():
 
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
-  return 'sign in'
-
+  if request.method == 'GET':
+    return render_template('signin.html')
+  elif request.method == 'POST':
+    return '{"response": "Posted"}'
+  else:
+    return '{"response": "Request Type Not Supported"}'
+    
 if __name__ == '__main__':
   app.run(host='0.0.0.0')

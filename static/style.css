@@ -1,1 +1,4 @@
-/*style sheet*/
+.error {
+    color: red;
+    display: hidden;
+}
