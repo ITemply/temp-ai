@@ -87,9 +87,27 @@ def signin():
   if request.method == 'GET':
     return render_template('signin.html')
   elif request.method == 'POST':
-    return '{"response": "Posted"}'
+    jsonData = request.get_json(force=True)
+    username = jsonData['username'].lower()
+    password = encodestring(jsonData['password'])
+    find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username}"')
+    try:
+      returnedJson = find.json()[0]
+      userPass = returnedJson['password']
+      usernameChcek = returnedJson['checkusername']
+      if username == usernameChcek and password == userPass:
+        return '{"response": "SL", "password": "' + userPass + '", "checkusername": "' + usernameChcek + '"}'
+      else:
+        return '{"response": "FAL"}'
+      return '{"response": "UTP"}'
+    except Exception:
+      return '{"response": "ANF"}'
   else:
     return '{"response": "Request Type Not Supported"}'
+
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+  return 'Home Page'
     
 if __name__ == '__main__':
   app.run(host='0.0.0.0')
