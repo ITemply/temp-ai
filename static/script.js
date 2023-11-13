@@ -8,6 +8,10 @@ function checkLogin() {
     if (location.includes('/signup') || location.includes('/signin')) {
       window.location.href = '/home'
     }
+  } else {
+    if (location.includes('/home')) {
+      window.location.href = '/'
+    }
   }
 }
 
@@ -72,6 +76,7 @@ async function signIn() {
       body: JSON.stringify(sendinglogdata),
       cache: 'default'
     })
+
     const respondjson = await senddata.json()
     const newjson = JSON.stringify(respondjson)
     const newstatus = JSON.parse(newjson)
@@ -84,8 +89,6 @@ async function signIn() {
       localStorage.setItem('checkUsername', signinUsername)
       localStorage.setItem('checkPassword', signinPassword)
 
-      alert(signinPassword)
-
       window.location.href = '/home'
     } else if (information == 'ANF') {
       logError('Account Not Found, please create an account and try again.')
@@ -97,4 +100,9 @@ async function signIn() {
   } catch (error) {
     console.error("Error:", error);
   }
+}
+
+function signOut() {
+  localStorage.removeItem('checkUsername')
+  localStorage.removeItem('checkPassword')
 }

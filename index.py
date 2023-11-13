@@ -122,7 +122,14 @@ def signin():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-  return 'Home Page'
+  if request.method == 'GET':
+    return render_template('home.html')
+  elif request.method == 'POST':
+    jsonData = request.get_json()
+    print(jsonData)
+    return '{"response": "Posted"}'
+  else:
+    return '{"response": "Request Type Not Supported"}'
     
 if __name__ == '__main__':
   app.run(host='0.0.0.0')
