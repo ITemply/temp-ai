@@ -1,9 +1,14 @@
 import os, json, requests, hashlib, re, cryptography
 
-from flask import Flask, request, render_template, redirect, abort, url_for
+from flask import Flask, request, render_template, redirect, abort, url_for, session, copy_current_request_context
 from cryptography.fernet import Fernet
+from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
+from threading import Lock
 
 app = Flask(__name__)
+socketio = SocketIO(app, async_mode=None)
+thread = None
+thread_lock = Lock()
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -73,12 +78,12 @@ def executeSQL(SQLData):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-  return render_template('index.html')
+  return render_template('index.html', async_mode=socketio.async_mode)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def login():
   if request.method == 'GET':
-    return render_template('signup.html')
+    return render_template('signup.html', async_mode=socketio.async_mode)
   elif request.method == 'POST':
     jsonData = request.get_json(force=True)
     username = jsonData['username']
@@ -100,7 +105,7 @@ def login():
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
   if request.method == 'GET':
-    return render_template('signin.html')
+    return render_template('signin.html', async_mode=socketio.async_mode)
   elif request.method == 'POST':
     jsonData = request.get_json(force=True)
     username = jsonData['username'].lower()
@@ -123,7 +128,7 @@ def signin():
 @app.route('/home', methods=['GET', 'POST'])
 def home():
   if request.method == 'GET':
-    return render_template('home.html')
+    return render_template('home.html', async_mode=socketio.async_mode)
   elif request.method == 'POST':
     jsonData = request.get_json()
     print(jsonData)
@@ -132,4 +137,4 @@ def home():
     return '{"response": "Request Type Not Supported"}'
     
 if __name__ == '__main__':
-  app.run(host='0.0.0.0')
+  socketio.run(app, host='0.0.0.0')
