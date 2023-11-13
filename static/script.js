@@ -105,4 +105,6 @@ async function signIn() {
 function signOut() {
   localStorage.removeItem('checkUsername')
   localStorage.removeItem('checkPassword')
+
+  window.location.href = '/'
 }
