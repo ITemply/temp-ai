@@ -1,15 +1,30 @@
-import os, json, requests, hashlib, re
+import os, json, requests, hashlib, re, cryptography
 
 from flask import Flask, request, render_template, redirect, abort, url_for
+from cryptography.fernet import Fernet
 
 app = Flask(__name__)
 
 from dotenv import load_dotenv
 load_dotenv()
 
+enkey = os.environ['EN_KEY'].encode()
+
 def cleantext(text):
   outputString = re.sub('<[^<]+?>', '', text)
   return outputString
+
+def bencode(inputstring):
+  enco = Fernet(enkey)
+  returning = enco.encrypt(inputstring.encode())
+  returnString = returning.decode()
+  return returnString
+
+def bdecode(inputstring):
+  enco = Fernet(enkey)
+  returning = enco.decrypt(inputstring.encode())
+  returnString = returning.decode()
+  return returnString
 
 def encodestring(inputstring):
   result = hashlib.sha512(inputstring.encode()) 
@@ -96,7 +111,7 @@ def signin():
       userPass = returnedJson['password']
       usernameChcek = returnedJson['checkusername']
       if username == usernameChcek and password == userPass:
-        return '{"response": "SL", "password": "' + userPass + '", "checkusername": "' + usernameChcek + '"}'
+        return '{"response": "SL", "password": "' + bencode(userPass) + '", "checkusername": "' + usernameChcek + '"}'
       else:
         return '{"response": "FAL"}'
       return '{"response": "UTP"}'

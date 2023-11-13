@@ -84,6 +84,8 @@ async function signIn() {
       localStorage.setItem('checkUsername', signinUsername)
       localStorage.setItem('checkPassword', signinPassword)
 
+      alert(signinPassword)
+
       window.location.href = '/home'
     } else if (information == 'ANF') {
       logError('Account Not Found, please create an account and try again.')
