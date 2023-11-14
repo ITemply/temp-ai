@@ -6,7 +6,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, ro
 from threading import Lock
 
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode=None)
+socketio = SocketIO(app)
 thread = None
 thread_lock = Lock()
 
@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 enkey = os.environ['EN_KEY'].encode()
+
+# Functions
 
 def cleantext(text):
   outputString = re.sub('<[^<]+?>', '', text)
@@ -76,6 +78,8 @@ def executeSQL(SQLData):
   response = requests.request("POST", url, headers=headers, data=payload)
   return response
 
+# Flask
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
   return render_template('index.html', async_mode=socketio.async_mode)
@@ -135,6 +139,14 @@ def home():
     return '{"response": "Posted"}'
   else:
     return '{"response": "Request Type Not Supported"}'
-    
+
+# Socket IO
+
+@socketio.on('connect')
+def connect(data):
+  print('Client Connected', data)
+
+# Flask
+
 if __name__ == '__main__':
-  socketio.run(app, host='0.0.0.0')
+  socketio.run(app, host='0.0.0.0', port=3000)
