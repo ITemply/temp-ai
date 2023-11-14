@@ -142,6 +142,17 @@ def home():
   else:
     return '{"response": "Request Type Not Supported"}'
 
+@app.route('/chat', methods=['GET', 'POST'])
+def chat():
+  if request.method == 'GET':
+    return render_template('chat.html', async_mode=socketio.async_mode)
+  elif request.method == 'POST':
+    jsonData = request.get_json()
+    print(jsonData)
+    return '{"response": "Posted"}'
+  else:
+    return '{"response": "Request Type Not Supported"}'
+
 # Socket IO
 
 
