@@ -1,5 +1,3 @@
-const socket = io()
-
 function checkLogin() {
   const username = localStorage.getItem('checkUsername')
   const password = localStorage.getItem('checkPassword')
