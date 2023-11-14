@@ -2,3 +2,13 @@
     color: red;
     display: hidden;
 }
+
+.mainchat {
+    border-color: black;
+    background-color: rgb(235, 235, 235);
+    border-width: 2px;
+    overflow: hidden;
+    border-style: solid;
+    width: 600px;
+    height: 350px;
+}
