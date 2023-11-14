@@ -1,3 +1,5 @@
+# Initialization 
+
 import os, json, requests, hashlib, re, cryptography
 
 from flask import Flask, request, render_template, redirect, abort, url_for, session, copy_current_request_context
