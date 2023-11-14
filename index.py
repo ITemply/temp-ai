@@ -144,9 +144,7 @@ def home():
 
 # Socket IO
 
-@socketio.on('connect')
-def connect(data):
-  print('Client Connected', data)
+
 
 # Flask
 
