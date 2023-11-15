@@ -16,11 +16,16 @@
   <center>
     <h1>Chat</h1>
     <p>main chat that everyone has access to</p>
-    <div class="mainchat" id="mainchat">
-    </div>
+  </center>
+  <div class="mainchat" id="mainchat">
+    <!--<span class="message"><b>Temply: </b>hello user!!</span>-->
+  </div>
+  <center>
     <br>
-    <input type="text" id="inputtextchat" placeholder="ur message here...">
-    <input type="button" value="Send Message">
+    <input type="text" id="inputtextchat" placeholder="ur message here..." class="mesasgeinput">
+    <input type="button" value="Send Message" onclick="sendMessage()">
+    <br><br>
+    <span class='error' id="error"></span>
   </center>
 </body>
   

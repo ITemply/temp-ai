@@ -1,14 +1,28 @@
+.bg {
+    color: white;
+}
+
 .error {
     color: red;
     display: hidden;
 }
 
 .mainchat {
+    position: inherit;
     border-color: black;
-    background-color: rgb(235, 235, 235);
     border-width: 2px;
     overflow: hidden;
     border-style: solid;
+    margin: auto;
     width: 600px;
     height: 350px;
+}
+
+.message {
+    position: relative;
+    left: 0.5%;
+}
+
+.mesasgeinput {
+    width: 475px;
 }

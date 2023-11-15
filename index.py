@@ -1,11 +1,12 @@
 # Initialization 
 
-import os, json, requests, hashlib, re, cryptography
+import os, json, requests, hashlib, re, cryptography, pytz
 
 from flask import Flask, request, render_template, redirect, abort, url_for, session, copy_current_request_context
 from cryptography.fernet import Fernet
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
 from threading import Lock
+from datetime import datetime
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -18,6 +19,20 @@ load_dotenv()
 enkey = os.environ['EN_KEY'].encode()
 
 # Functions
+
+def checkUser(username, password):
+  find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
+  if find.json()[0]:
+    data = find.json()[0]
+    checkUsername = data['checkusername']
+    checkPassword = data['password']
+    if checkUsername == username.lower() and checkPassword == password:
+      return True
+    else:
+      return False
+  else:
+    return False
+  
 
 def cleantext(text):
   outputString = re.sub('<[^<]+?>', '', text)
@@ -59,8 +74,14 @@ def getUserId():
   find = executeSQL(f'SELECT * FROM accounts.accountCount')
   jsonData = find.json()[0]
   count = jsonData['numberCount']
-  id = jsonData['accountCountID']
   response = executeSQL(f"UPDATE accounts.accountCount SET numberCount={int(count) + 1}")
+  return count + 1
+
+def getMessageId():
+  find = executeSQL(f'SELECT * FROM chats.messageCount')
+  jsonData = find.json()[0]
+  count = jsonData['numberCount']
+  response = executeSQL(f"UPDATE chats.messageCount SET numberCount={int(count) + 1}")
   return count + 1
 
 def executeSQL(SQLData):
@@ -153,7 +174,26 @@ def chat():
 
 # Socket IO
 
+@socketio.on('sendMessage')
+def sendMessage(messageData):
+  message = messageData['text']
+  username = messageData['username']
+  password = bdecode(messageData['password'])
+  messageType = messageData['type']
 
+  if messageType == 'mainRoom':
+    if checkUser(username, password):
+      messageId = getMessageId()
+      newMessage = cleantext(message)
+      tz_NY = pytz.timezone('America/New_York') 
+      datetime_NY = datetime.now(tz_NY)
+      currentTime = datetime_NY.strftime('%H:%M')
+      executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', '{int(messageId)}', {str(currentTime)}, 'text')")
+
+      messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + messageid + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
+      emit('newMessage', messageBackData, broadcast=True)
+    else:
+      emit('response', 'Failed To Send')
 
 # Flask
 
