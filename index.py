@@ -135,15 +135,15 @@ def signin():
     return render_template('signin.html', async_mode=socketio.async_mode)
   elif request.method == 'POST':
     jsonData = request.get_json(force=True)
-    username = jsonData['username'].lower()
+    username = jsonData['username']
     password = encodestring(jsonData['password'])
-    find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username}"')
+    find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
     try:
       returnedJson = find.json()[0]
       userPass = returnedJson['password']
       usernameChcek = returnedJson['checkusername']
-      if username == usernameChcek and password == userPass:
-        return '{"response": "SL", "password": "' + bencode(userPass) + '", "checkusername": "' + usernameChcek + '"}'
+      if username.lower() == usernameChcek and password == userPass:
+        return '{"response": "SL", "password": "' + bencode(userPass) + '", "checkusername": "' + username + '"}'
       else:
         return '{"response": "FAL"}'
       return '{"response": "UTP"}'
@@ -181,6 +181,8 @@ def sendMessage(messageData):
   password = bdecode(messageData['password'])
   messageType = messageData['type']
 
+  print(username)
+
   if messageType == 'mainRoom':
     if checkUser(username, password):
       messageId = getMessageId()
@@ -188,9 +190,9 @@ def sendMessage(messageData):
       tz_NY = pytz.timezone('America/New_York') 
       datetime_NY = datetime.now(tz_NY)
       currentTime = datetime_NY.strftime('%H:%M')
-      executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', '{int(messageId)}', {str(currentTime)}, 'text')")
+      executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, {str(currentTime)}, 'text')")
 
-      messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + messageid + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
+      messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
       emit('newMessage', messageBackData, broadcast=True)
     else:
       emit('response', 'Failed To Send')
