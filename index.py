@@ -32,7 +32,38 @@ def checkUser(username, password):
       return False
   else:
     return False
-  
+
+def checkPerms(username, password):
+  find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
+  if find.json()[0]:
+    data = find.json()[0]
+    checkUsername = data['checkusername']
+    checkPassword = data['password']
+    status = data['status']
+    if checkUsername == username.lower() and checkPassword == password:
+      if status == 'Admin' or status == 'Moderator':
+        return True
+      else:
+        return False
+    else:
+      return False
+  else:
+    return False
+
+def checkCommand(text):
+  commands = ['/clear']
+  for command in range(len(commands)):
+    currentCommand = commands[command]
+    if currentCommand in text:
+      return True
+    else:
+      return False
+
+def executeCommand(command, data):
+  if command == '/clear':
+    table = data[0]
+    executeSQL(f'DELETE FROM {table}')
+    emit('clearCommand', '{"room": "' + table + '"}')
 
 def cleantext(text):
   outputString = re.sub('<[^<]+?>', '', text)
@@ -181,21 +212,58 @@ def sendMessage(messageData):
   password = bdecode(messageData['password'])
   messageType = messageData['type']
 
-  print(username)
-
   if messageType == 'mainRoom':
     if checkUser(username, password):
       messageId = getMessageId()
       newMessage = cleantext(message)
-      tz_NY = pytz.timezone('America/New_York') 
-      datetime_NY = datetime.now(tz_NY)
-      currentTime = datetime_NY.strftime('%H:%M')
-      executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, {str(currentTime)}, 'text')")
+      if not checkCommand(newMessage):
+        tz_NY = pytz.timezone('America/New_York') 
+        datetime_NY = datetime.now(tz_NY)
+        currentTime = datetime_NY.strftime('%H:%M')
+        executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'text')")
 
-      messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
-      emit('newMessage', messageBackData, broadcast=True)
+        messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
+        emit('newMessage', messageBackData, broadcast=True)
+      else:
+        if checkPerms(username, password):
+          if ';' in newMessage:
+            commandSplit = newMessage.split(';')
+            commandData = []
+            for entry in range(1, len(commandSplit)):
+              commandData.append(commandSplit[entry])
+              executeCommand(commandSplit[0], commandData)
+          else:
+            emit('commandFailed', 'Command Requires ;')
+        else:
+          tz_NY = pytz.timezone('America/New_York') 
+          datetime_NY = datetime.now(tz_NY)
+          currentTime = datetime_NY.strftime('%H:%M')
+          executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'text')")
+
+          messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
+          emit('newMessage', messageBackData, broadcast=True)
+          
     else:
       emit('response', 'Failed To Send')
+
+@socketio.on('getMessages')
+def getMessages(getMessageData):
+  room = getMessageData['room']
+
+  if room == 'mainRoom':
+    sendingString = ''
+    find = executeSQL('SELECT * FROM chats.mainRoom ORDER BY messageid')
+    jsonData = find.json()
+    for entry in range(len(jsonData)):
+      currentData = jsonData[entry]
+      sendinguser = currentData['sendinguser']
+      messagetext = currentData['messagetext']
+      messagetime = currentData['messagetime']
+      messageid = currentData['messageid']
+      messagetype = currentData['messagetype']
+      sendingString = sendingString + sendinguser + ';' + messagetext + ';' + messagetime + ';' + str(messageid) + ';' + messagetype + '>'
+    loadBackData = '{"messages": "' + sendingString + '"}'
+    emit('loadMessages', loadBackData)
 
 # Flask
 
