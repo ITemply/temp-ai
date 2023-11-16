@@ -82,12 +82,16 @@ async function signIn() {
     const newstatus = JSON.parse(newjson)
     const information = newstatus.response
 
+    console.log(newstatus)
+
     if (information == 'SL') {
       const signinUsername = newstatus.checkusername
       const signinPassword = newstatus.password
+      const signinId = newstatus.id
       
       localStorage.setItem('checkUsername', signinUsername)
       localStorage.setItem('checkPassword', signinPassword)
+      localStorage.setItem('checkId', signinId)
 
       window.location.href = '/home'
     } else if (information == 'ANF') {

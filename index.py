@@ -4,7 +4,7 @@ import os, json, requests, hashlib, re, cryptography, pytz
 
 from flask import Flask, request, render_template, redirect, abort, url_for, session, copy_current_request_context
 from cryptography.fernet import Fernet
-from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
+from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect, send
 from threading import Lock
 from datetime import datetime
 
@@ -173,12 +173,13 @@ def signin():
       returnedJson = find.json()[0]
       userPass = returnedJson['password']
       usernameChcek = returnedJson['checkusername']
+      id = returnedJson['userid']
       if username.lower() == usernameChcek and password == userPass:
-        return '{"response": "SL", "password": "' + bencode(userPass) + '", "checkusername": "' + username + '"}'
+        return '{"response": "SL", "password": "' + bencode(userPass) + '", "checkusername": "' + username + '", "id": "' + str(id) + '"}'
       else:
         return '{"response": "FAL"}'
       return '{"response": "UTP"}'
-    except Exception:
+    except Exception as e:
       return '{"response": "ANF"}'
   else:
     return '{"response": "Request Type Not Supported"}'
@@ -203,6 +204,15 @@ def chat():
   else:
     return '{"response": "Request Type Not Supported"}'
 
+@app.route('/random-chat', methods=['GET', 'POST'])
+def randomchat():
+  if request.method == 'GET':
+    return render_template('random-chat.html', async_mode=socketio.async_mode)
+  elif request.method == 'POST':
+    return '{"response": "Posted"}'
+  else:
+    return '{"response": "Request Type Not Supported"}'
+
 # Socket IO
 
 @socketio.on('sendMessage')
@@ -220,7 +230,7 @@ def sendMessage(messageData):
         tz_NY = pytz.timezone('America/New_York') 
         datetime_NY = datetime.now(tz_NY)
         currentTime = datetime_NY.strftime('%H:%M')
-        executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'text')")
+        executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'mainRoom')")
 
         messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
         emit('newMessage', messageBackData, broadcast=True)
@@ -244,6 +254,8 @@ def sendMessage(messageData):
           emit('newMessage', messageBackData, broadcast=True)
     else:
       emit('response', 'Failed To Send')
+  else:
+    print('newroom')
 
 @socketio.on('getMessages')
 def getMessages(getMessageData):
