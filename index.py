@@ -1,6 +1,6 @@
 # Initialization 
 
-import os, json, requests, hashlib, re, cryptography, pytz
+import os, json, requests, hashlib, re, cryptography, pytz, random
 
 from flask import Flask, request, render_template, redirect, abort, url_for, session, copy_current_request_context
 from cryptography.fernet import Fernet
@@ -215,6 +215,8 @@ def randomchat():
 
 # Socket IO
 
+lookingForRoom = []
+
 @socketio.on('sendMessage')
 def sendMessage(messageData):
   message = messageData['text']
@@ -275,6 +277,38 @@ def getMessages(getMessageData):
       sendingString = sendingString + sendinguser + ';' + messagetext + ';' + messagetime + ';' + str(messageid) + ';' + messagetype + '>'
     loadBackData = '{"messages": "' + sendingString + '"}'
     emit('loadMessages', loadBackData)
+
+@socketio.on('join')
+def joinRoom(joinRoomData):
+  uid = joinRoomData['room']
+  if len(lookingForRoom) == 0:
+    lookingForRoom.append(uid)
+  else:
+    for entry in range(len(lookingForRoom)):
+      if str(lookingForRoom[entry]) == str(uid):
+        pass
+      else:
+        lookingForRoom.append(uid)
+  print(lookingForRoom)
+  try:
+    usercount = 0
+    for userid in range(len(lookingForRoom)):
+      usercount = usercount + 1
+    if usercount < 2:
+      emit('notEnoughUsers', '{"userCount": "' + str(usercount) + '"}')
+    else:
+      myid = uid
+      inter = random.randint(0, len(lookingForRoom))
+      otherid = lookingForRoom[inter]
+
+  except Exception as e:
+    emit('failedToConnect', '{"reason": "Failed To Create Room"}')
+    print(e)
+
+@socketio.on('clientDisconnecting')
+def userLeaving(clientDisconnectingData):
+  uid = clientDisconnectingData['uid']
+  lookingForRoom.remove(uid)
 
 # Flask
 

@@ -11,7 +11,7 @@
 
 <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
 <script src="static/js/random-chat.js"></script>
-  
+
 <body>
   <center>
     <h1>Chat</h1>
@@ -23,6 +23,8 @@
     <br>
     <input type="text" id="inputtextchat" placeholder="ur message here..." class="mesasgeinput">
     <input type="button" value="Send Message" onclick="sendMessage()">
+    <br><br>
+    <input type="button" value="Skip User" onclick="leaveRoom()">
     <br><br>
     <span class='error' id="error"></span>
   </center>

@@ -1,6 +1,22 @@
 const socket = io()
 
-var room = localStorage.getItem('checkId')
+function makeid(length) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+var sessionID = makeid(25)
+
+console.log(sessionID)
+
+var room = ''
 
 function logError(errorText) {
   let errorElement = document.getElementById('error')
@@ -9,9 +25,33 @@ function logError(errorText) {
 }
 
 socket.on('connect', () => {
-  const getMessageData = {room: room}
+  const joinRoomData = {room: sessionID}
 
-  socket.emit('getMessages', getMessageData)
+  socket.emit('join', joinRoomData)
+})
+
+function leaveRoom() {
+  socket.emit('clientDisconnecting', {'uid': sessionID})
+
+  setTimeout(function(){
+    window.location.reload(true)
+}, 250);
+}
+
+socket.on('notEnoughUsers', (backData) => {
+  const jsonData = JSON.parse(backData)
+  const userCount = jsonData.userCount
+
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Not enought users to make a random room. Current user count, ' + userCount + ' user active.</span><br>'
+  document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+})
+
+socket.on('failedToConnect', (backData) => {
+  const jsonData = JSON.parse(backData)
+  const userCount = jsonData.reason
+
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Server Error: ' + userCount + '</span><br>'
+  document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
 socket.on('newMessage', (messageData) => {
