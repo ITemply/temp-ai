@@ -68,7 +68,7 @@ def executeCommand(command, data):
   if command == '/clear':
     table = data[0]
     executeSQL(f'DELETE FROM {table}')
-    emit('clearCommand', '{"room": "' + table + '"}')
+    emit('clearCommand', '{"room": "' + table + '"}', broadcast=True)
 
 def cleantext(text):
   outputString = re.sub('<[^<]+?>', '', text)

@@ -23,6 +23,8 @@ socket.on('newMessage', (messageData) => {
   if (type == 'mainRoom') {
     const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+    const objDiv = document.getElementById('mainchat')
+    objDiv.scrollTop = objDiv.scrollHeight
   }
 })
 
@@ -59,6 +61,8 @@ socket.on('loadMessages', (loadBackData) => {
     if (type == 'mainRoom') {
       const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span><br>'
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+      const objDiv = document.getElementById('mainchat')
+      objDiv.scrollTop = objDiv.scrollHeight
     }
   }
 })
