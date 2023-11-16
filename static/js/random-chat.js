@@ -37,9 +37,8 @@ if (localStorage.getItem('sessionId') == null) {
   }
 }
 
-alert(sessionID)
-
 var room = ''
+var inroom = 'false'
 
 function logError(errorText) {
   let errorElement = document.getElementById('error')
@@ -48,7 +47,7 @@ function logError(errorText) {
 }
 
 socket.on('connect', () => {
-  const joinRoomData = {room: sessionID}
+  const joinRoomData = {room: sessionID, inroom: inroom}
 
   socket.emit('join', joinRoomData)
 })
@@ -85,9 +84,28 @@ socket.on('newMessage', (messageData) => {
   const time = jsonData.messagetime
   const type = jsonData.messagetype
 
-  if (type == 'text') {
+  if (type == 'mainRoom') {
+    const objDiv = document.getElementById('mainchat')
+    var bottom = false
+    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+      bottom = true
+    }
     const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+    if (bottom) {
+     objDiv.scrollTop = objDiv.scrollHeight
+    }
+  } else if (type == room){
+    const objDiv = document.getElementById('mainchat')
+    var bottom = false
+    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+      bottom = true
+    }
+    const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
+    document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+    if (bottom) {
+     objDiv.scrollTop = objDiv.scrollHeight
+    }
   }
 })
 
@@ -107,23 +125,33 @@ socket.on('delMessage', (messageData) => {
   }
 })
 
-socket.on('loadMessages', (loadBackData) => {
-  const jsonData = JSON.parse(loadBackData)
-  const sendingStr = jsonData.messages
+socket.on('joinRoom', (joiningRoomData) => {
+  const jsonData = JSON.parse(joiningRoomData)
+  const myuid = localStorage.getItem('checkId')
+  const users = jsonData.users
+  const myroom = jsonData.room
 
-  const splitMessages = sendingStr.split('>')
-  for (let messageI = 0; messageI < splitMessages.length; messageI++) {
-    const splitMessage = splitMessages[messageI].split(';')
-    const username = splitMessage[0]
-    const message = splitMessage[1]
-    const time = splitMessage[2]
-    const id = splitMessage[3]
-    const type = splitMessage[4]
+  if (users.includes(myuid)) {
+    room = myroom
+    inroom = 'true'
+    document.getElementById('mainchat').innerHTML = ''
+    const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: You have joined a chat! Connected to: ' + room + '</span><br>'
+    document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+  }
+})
 
-    if (type == 'text') {
-      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span><br>'
+socket.on('leaveRoom', (leavingRoomData) => {
+  const jsonData = JSON.parse(leavingRoomData)
+  const myroom = jsonData.room
+
+  if (myroom == room) {
+    setTimeout(function(){
+      const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Other user has skipped!</span><br>'
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-    }
+    }, 1000);
+    setTimeout(function(){
+      window.location.reload(true)
+    }, 2500);
   }
 })
 

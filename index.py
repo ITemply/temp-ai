@@ -1,6 +1,6 @@
 # Initialization 
 
-import os, json, requests, hashlib, re, cryptography, pytz, random
+import os, json, requests, hashlib, re, cryptography, pytz, random, time, string
 
 from flask import Flask, request, render_template, redirect, abort, url_for, session, copy_current_request_context
 from cryptography.fernet import Fernet
@@ -195,7 +195,6 @@ def home():
     return render_template('home.html', async_mode=socketio.async_mode)
   elif request.method == 'POST':
     jsonData = request.get_json()
-    print(jsonData)
     return '{"response": "Posted"}'
   else:
     return '{"response": "Request Type Not Supported"}'
@@ -263,7 +262,37 @@ def sendMessage(messageData):
     else:
       emit('response', 'Failed To Send')
   else:
-    print('newroom')
+    if checkUser(username, password):
+      messageId = getMessageId()
+      newMessage = cleantext(message)
+      if not checkCommand(newMessage):
+        tz_NY = pytz.timezone('America/New_York') 
+        datetime_NY = datetime.now(tz_NY)
+        currentTime = datetime_NY.strftime('%H:%M')
+        executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', '{messageType}')")
+
+        messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "' + messageType + '"}'
+        emit('newMessage', messageBackData, broadcast=True)
+      else:
+        if checkPerms(username, password):
+          if ';' in newMessage:
+            commandSplit = newMessage.split(';')
+            commandData = []
+            for entry in range(1, len(commandSplit)):
+              commandData.append(commandSplit[entry])
+              executeCommand(commandSplit[0], commandData)
+          else:
+            pass
+        else:
+          tz_NY = pytz.timezone('America/New_York') 
+          datetime_NY = datetime.now(tz_NY)
+          currentTime = datetime_NY.strftime('%H:%M')
+          executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', {messageType})")
+
+          messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
+          emit('newMessage', messageBackData, broadcast=True)
+    else:
+      emit('response', 'Failed To Send')
 
 @socketio.on('getMessages')
 def getMessages(getMessageData):
@@ -287,29 +316,48 @@ def getMessages(getMessageData):
 @socketio.on('join')
 def joinRoom(joinRoomData):
   uid = joinRoomData['room']
+  inroom = joinRoomData['inroom']
   if len(lookingForRoom) == 0:
-    lookingForRoom.append(uid)
-  else:
+    repeat = False
+    for entry2 in openRooms:
+      if uid in entry2:
+        repeat = True
     for entry in range(len(lookingForRoom)):
       if str(lookingForRoom[entry]) == str(uid):
-        pass
-      else:
-        lookingForRoom.append(uid)
-  print(lookingForRoom, '\n\n')
+        repeat = True
+    if not repeat:
+      lookingForRoom.append(uid)
+  else:
+    lookingForRoom.append(uid)
   try:
     usercount = 0
+    openRoomCount = 0
     for userid in range(len(lookingForRoom)):
       usercount = usercount + 1
-    if usercount < 1:
-      emit('notEnoughUsers', '{"userCount": "' + str(usercount) + '"}')
-    else:
+    for userid in range(len(openRooms)):
+      openRoomCount = openRoomCount + 1
+    if not usercount < 2:
       myid = uid
-      inter = random.randint(0, len(lookingForRoom))
+      inter = random.randint(0, len(lookingForRoom)) - 1
       otherid = lookingForRoom[inter]
-      if myid == otherid:
-        einter = random.randint(0, len(lookingForRoom))
-        otherid = lookingForRoom[einter]
-      print(myid, otherid)
+      while otherid == myid:
+        inter2 = random.randint(0, len(lookingForRoom)) - 1
+        otherid = lookingForRoom[inter2]
+      roomid = generateRoomId()
+      roomlist = []
+      roomlist.append(myid)
+      roomlist.append(otherid)
+      roomlist.append(roomid)
+      openRooms.append(roomlist)
+      lookingForRoom.remove(myid)
+      lookingForRoom.remove(otherid)
+      loadinguserstr = myid + '-' + otherid
+      emit('joinRoom', '{"users": "' + loadinguserstr + '", "room": "' + roomid + '"}', broadcast=True)
+    elif inroom == 'true':
+      pass
+    else:
+      emit('notEnoughUsers', '{"userCount": "' + str(usercount) + '"}')
+
   except Exception as e:
     emit('failedToConnect', '{"reason": "Failed To Create Room"}')
     print(e)
@@ -317,7 +365,11 @@ def joinRoom(joinRoomData):
 @socketio.on('clientDisconnecting')
 def userLeaving(clientDisconnectingData):
   uid = clientDisconnectingData['uid']
-  lookingForRoom.remove(uid)
+  for room in range(len(openRooms)):
+    if uid in openRooms[room]:
+      roomid = openRooms[room][2]
+      emit('leaveRoom', '{"room": "' + roomid + '"}', broadcast=True)
+      openRooms.pop(room)
 
 # Flask
 

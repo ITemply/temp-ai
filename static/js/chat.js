@@ -21,10 +21,17 @@ socket.on('newMessage', (messageData) => {
   const type = jsonData.messagetype
 
   if (type == 'mainRoom') {
+    const objDiv = document.getElementById('mainchat')
+    var bottom = false
+    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+      bottom = true
+    }
+    console.log(objDiv.offsetHeight + ' ' + objDiv.scrollHeight + ' ' + objDiv.scrollTop)
     const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-    const objDiv = document.getElementById('mainchat')
-    objDiv.scrollTop = objDiv.scrollHeight
+    if (bottom) {
+     objDiv.scrollTop = objDiv.scrollHeight
+    }
   }
 })
 
@@ -50,7 +57,9 @@ socket.on('loadMessages', (loadBackData) => {
   const sendingStr = jsonData.messages
 
   const splitMessages = sendingStr.split('>')
+  var scounter = 0
   for (let messageI = 0; messageI < splitMessages.length; messageI++) {
+    scounter = scounter + 1
     const splitMessage = splitMessages[messageI].split(';')
     const username = splitMessage[0]
     const message = splitMessage[1]
@@ -58,7 +67,7 @@ socket.on('loadMessages', (loadBackData) => {
     const id = splitMessage[3]
     const type = splitMessage[4]
 
-    if (type == 'mainRoom') {
+    if (type == 'mainRoom' && scounter <= 50) {
       const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span><br>'
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
       const objDiv = document.getElementById('mainchat')

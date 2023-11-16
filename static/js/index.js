@@ -9,7 +9,7 @@ function checkLogin() {
       window.location.href = '/home'
     }
   } else {
-    if (location.includes('/home')) {
+    if (location.includes('/home') || location.includes('/chat') || location.includes('/random-chat')) {
       window.location.href = '/'
     }
   }

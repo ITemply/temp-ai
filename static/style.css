@@ -7,11 +7,11 @@
     position: inherit;
     border-color: black;
     border-width: 2px;
-    overflow: hidden;
+    overflow-x: hidden;
     border-style: solid;
     margin: auto;
-    width: 600px;
-    height: 350px;
+    width: 750px;
+    height: 400px;
 }
 
 .message {
@@ -21,4 +21,24 @@
 
 .mesasgeinput {
     width: 475px;
+}
+
+.btn {
+    width: 132px;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+  
+::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+   
+::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+  
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
 }
