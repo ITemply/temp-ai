@@ -20,7 +20,7 @@ socket.on('newMessage', (messageData) => {
   const time = jsonData.messagetime
   const type = jsonData.messagetype
 
-  if (type == 'text') {
+  if (type == 'mainRoom') {
     const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
   }
@@ -56,7 +56,7 @@ socket.on('loadMessages', (loadBackData) => {
     const id = splitMessage[3]
     const type = splitMessage[4]
 
-    if (type == 'text') {
+    if (type == 'mainRoom') {
       const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span><br>'
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
     }

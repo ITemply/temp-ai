@@ -232,7 +232,7 @@ def sendMessage(messageData):
         currentTime = datetime_NY.strftime('%H:%M')
         executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'mainRoom')")
 
-        messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
+        messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "mainRoom"}'
         emit('newMessage', messageBackData, broadcast=True)
       else:
         if checkPerms(username, password):
