@@ -233,7 +233,7 @@ def sendMessage(messageData):
               commandData.append(commandSplit[entry])
               executeCommand(commandSplit[0], commandData)
           else:
-            emit('commandFailed', 'Command Requires ;')
+            pass
         else:
           tz_NY = pytz.timezone('America/New_York') 
           datetime_NY = datetime.now(tz_NY)
@@ -242,7 +242,6 @@ def sendMessage(messageData):
 
           messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
           emit('newMessage', messageBackData, broadcast=True)
-          
     else:
       emit('response', 'Failed To Send')
 
