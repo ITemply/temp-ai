@@ -33,6 +33,11 @@ def checkUser(username, password):
   else:
     return False
 
+def generateRoomId():
+    letters = string.ascii_letters
+    random_string = ''.join(random.choice(letters) for i in range(25))
+    return 'room-' + random_string
+
 def checkPerms(username, password):
   find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
   if find.json()[0]:
@@ -215,6 +220,7 @@ def randomchat():
 
 # Socket IO
 
+openRooms = []
 lookingForRoom = []
 
 @socketio.on('sendMessage')
@@ -289,18 +295,21 @@ def joinRoom(joinRoomData):
         pass
       else:
         lookingForRoom.append(uid)
-  print(lookingForRoom)
+  print(lookingForRoom, '\n\n')
   try:
     usercount = 0
     for userid in range(len(lookingForRoom)):
       usercount = usercount + 1
-    if usercount < 2:
+    if usercount < 1:
       emit('notEnoughUsers', '{"userCount": "' + str(usercount) + '"}')
     else:
       myid = uid
       inter = random.randint(0, len(lookingForRoom))
       otherid = lookingForRoom[inter]
-
+      if myid == otherid:
+        einter = random.randint(0, len(lookingForRoom))
+        otherid = lookingForRoom[einter]
+      print(myid, otherid)
   except Exception as e:
     emit('failedToConnect', '{"reason": "Failed To Create Room"}')
     print(e)

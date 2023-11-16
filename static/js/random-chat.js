@@ -12,9 +12,32 @@ function makeid(length) {
   return result;
 }
 
-var sessionID = makeid(25)
+var sessionID = ''
 
-console.log(sessionID)
+if (localStorage.getItem('sessionId') == null) {
+  localStorage.setItem('sessionId', makeid(25))
+  sessionID = localStorage.getItem('sessionId')
+  let date = new Date()
+  localStorage.setItem('sessionCreationTime', date.getTime())
+} else {
+  if (localStorage.getItem('sessionCreationTime') == null) {
+    let adate = new Date()
+    localStorage.setItem('sessionCreationTime', adate.getTime())
+    sessionID = localStorage.getItem('sessionId')
+  } else {
+    let newdate = new Date()
+    if (parseFloat(localStorage.getItem('sessionCreationTime')) < (parseFloat(newdate.getTime())- 10000000)) {
+      alert('Your session ID has been changed due to it being outdated.')
+      localStorage.setItem('sessionCreationTime', newdate.getTime())
+      localStorage.setItem('sessionId', makeid(25))
+      sessionID = localStorage.getItem('sessionId')
+    } else {
+      sessionID = localStorage.getItem('sessionId')
+    }
+  }
+}
+
+alert(sessionID)
 
 var room = ''
 
@@ -35,14 +58,14 @@ function leaveRoom() {
 
   setTimeout(function(){
     window.location.reload(true)
-}, 250);
+  }, 250);
 }
 
 socket.on('notEnoughUsers', (backData) => {
   const jsonData = JSON.parse(backData)
   const userCount = jsonData.userCount
 
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Not enought users to make a random room. Current user count, ' + userCount + ' user active.</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Not enought users to make a random room. Current user waiting count, ' + userCount + ' user(s) active.</span><br>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
@@ -50,7 +73,7 @@ socket.on('failedToConnect', (backData) => {
   const jsonData = JSON.parse(backData)
   const userCount = jsonData.reason
 
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Server Error: ' + userCount + '</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + userCount + '</span><br>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
@@ -74,7 +97,6 @@ socket.on('clearCommand', (clearCommandData) => {
     document.getElementById('mainchat').innerHTML = ''
   }
 })
-
 
 socket.on('delMessage', (messageData) => {
   const jsonData = JSON.parse(messageData)
