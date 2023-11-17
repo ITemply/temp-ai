@@ -7,6 +7,7 @@ function logError(errorText) {
 }
 
 socket.on('connect', () => {
+  document.getElementById('mainchat').innerHTML = ''
   const getMessageData = {room: 'mainRoom'}
 
   socket.emit('getMessages', getMessageData)

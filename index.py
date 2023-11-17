@@ -261,7 +261,9 @@ def sendMessage(messageData):
           emit('newMessage', messageBackData, broadcast=True)
     else:
       emit('response', 'Failed To Send')
-  else:
+  elif messageType == '':
+    pass
+  elif 'room-' in messageType:
     if checkUser(username, password):
       messageId = getMessageId()
       newMessage = cleantext(message)
@@ -273,7 +275,7 @@ def sendMessage(messageData):
 
         messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "' + messageType + '"}'
         emit('newMessage', messageBackData, broadcast=True)
-      else:
+      elif 'room-' in messageType:
         if checkPerms(username, password):
           if ';' in newMessage:
             commandSplit = newMessage.split(';')
@@ -297,7 +299,6 @@ def sendMessage(messageData):
 @socketio.on('getMessages')
 def getMessages(getMessageData):
   room = getMessageData['room']
-
   if room == 'mainRoom':
     sendingString = ''
     find = executeSQL('SELECT * FROM chats.mainRoom ORDER BY messageid')
@@ -318,17 +319,15 @@ def joinRoom(joinRoomData):
   uid = joinRoomData['room']
   inroom = joinRoomData['inroom']
   if len(lookingForRoom) == 0:
+    lookingForRoom.append(uid)
+  else:
     repeat = False
-    for entry2 in openRooms:
-      if uid in entry2:
-        repeat = True
-    for entry in range(len(lookingForRoom)):
-      if str(lookingForRoom[entry]) == str(uid):
-        repeat = True
+    if str(uid) in openRooms:
+      repeat = True
+    if str(uid) in lookingForRoom:
+      repeat = True
     if not repeat:
       lookingForRoom.append(uid)
-  else:
-    lookingForRoom.append(uid)
   try:
     usercount = 0
     openRoomCount = 0
@@ -336,7 +335,9 @@ def joinRoom(joinRoomData):
       usercount = usercount + 1
     for userid in range(len(openRooms)):
       openRoomCount = openRoomCount + 1
-    if not usercount < 2:
+    if inroom == 'true':
+      pass
+    elif usercount >= 2:
       myid = uid
       inter = random.randint(0, len(lookingForRoom)) - 1
       otherid = lookingForRoom[inter]
@@ -351,10 +352,9 @@ def joinRoom(joinRoomData):
       openRooms.append(roomlist)
       lookingForRoom.remove(myid)
       lookingForRoom.remove(otherid)
+      print(lookingForRoom, openRooms, '\n\n')
       loadinguserstr = myid + '-' + otherid
       emit('joinRoom', '{"users": "' + loadinguserstr + '", "room": "' + roomid + '"}', broadcast=True)
-    elif inroom == 'true':
-      pass
     else:
       emit('notEnoughUsers', '{"userCount": "' + str(usercount) + '"}')
 

@@ -47,6 +47,7 @@ function logError(errorText) {
 }
 
 socket.on('connect', () => {
+  document.getElementById('mainchat').innerHTML = ''
   const joinRoomData = {room: sessionID, inroom: inroom}
 
   socket.emit('join', joinRoomData)
@@ -84,18 +85,7 @@ socket.on('newMessage', (messageData) => {
   const time = jsonData.messagetime
   const type = jsonData.messagetype
 
-  if (type == 'mainRoom') {
-    const objDiv = document.getElementById('mainchat')
-    var bottom = false
-    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
-      bottom = true
-    }
-    const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
-    document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-    if (bottom) {
-     objDiv.scrollTop = objDiv.scrollHeight
-    }
-  } else if (type == room){
+  if (type == room){
     const objDiv = document.getElementById('mainchat')
     var bottom = false
     if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
@@ -111,7 +101,7 @@ socket.on('newMessage', (messageData) => {
 
 socket.on('clearCommand', (clearCommandData) => {
   const jsonData = JSON.parse(clearCommandData)
-  if (jsonData.room == 'chats.mainRoom') {
+  if (jsonData.room == 'chats.randomRoomChats') {
     document.getElementById('mainchat').innerHTML = ''
   }
 })
