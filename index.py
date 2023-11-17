@@ -1,6 +1,6 @@
 # Initialization 
 
-import os, json, requests, hashlib, re, cryptography, pytz, random, time, string
+import os, json, requests, hashlib, re, cryptography, pytz, random, time, string, logging
 
 from flask import Flask, request, render_template, redirect, abort, url_for, session, copy_current_request_context
 from cryptography.fernet import Fernet
@@ -8,6 +8,8 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, ro
 from threading import Lock
 from datetime import datetime
 
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 app = Flask(__name__)
 socketio = SocketIO(app)
 thread = None
@@ -275,24 +277,23 @@ def sendMessage(messageData):
 
         messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "' + messageType + '"}'
         emit('newMessage', messageBackData, broadcast=True)
-      elif 'room-' in messageType:
-        if checkPerms(username, password):
-          if ';' in newMessage:
-            commandSplit = newMessage.split(';')
-            commandData = []
-            for entry in range(1, len(commandSplit)):
-              commandData.append(commandSplit[entry])
-              executeCommand(commandSplit[0], commandData)
-          else:
-            pass
+      if checkPerms(username, password):
+        if ';' in newMessage:
+          commandSplit = newMessage.split(';')
+          commandData = []
+          for entry in range(1, len(commandSplit)):
+            commandData.append(commandSplit[entry])
+            executeCommand(commandSplit[0], commandData)
         else:
-          tz_NY = pytz.timezone('America/New_York') 
-          datetime_NY = datetime.now(tz_NY)
-          currentTime = datetime_NY.strftime('%H:%M')
-          executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', {messageType})")
+          pass
+      else:
+        tz_NY = pytz.timezone('America/New_York') 
+        datetime_NY = datetime.now(tz_NY)
+        currentTime = datetime_NY.strftime('%H:%M')
+        executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', {messageType})")
 
-          messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
-          emit('newMessage', messageBackData, broadcast=True)
+        messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
+        emit('newMessage', messageBackData, broadcast=True)
     else:
       emit('response', 'Failed To Send')
 
@@ -310,7 +311,7 @@ def getMessages(getMessageData):
       messagetime = currentData['messagetime']
       messageid = currentData['messageid']
       messagetype = currentData['messagetype']
-      sendingString = sendingString + sendinguser + ';' + messagetext + ';' + messagetime + ';' + str(messageid) + ';' + messagetype + '>'
+      sendingString = sendingString + sendinguser + '?' + messagetext + '?' + messagetime + '?' + str(messageid) + '?' + messagetype + '>'
     loadBackData = '{"messages": "' + sendingString + '"}'
     emit('loadMessages', loadBackData)
 

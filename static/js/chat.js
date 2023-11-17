@@ -22,16 +22,28 @@ socket.on('newMessage', (messageData) => {
   const type = jsonData.messagetype
 
   if (type == 'mainRoom') {
-    const objDiv = document.getElementById('mainchat')
-    var bottom = false
-    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
-      bottom = true
-    }
-    console.log(objDiv.offsetHeight + ' ' + objDiv.scrollHeight + ' ' + objDiv.scrollTop)
-    const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
-    document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-    if (bottom) {
-     objDiv.scrollTop = objDiv.scrollHeight
+    if (text.includes('base64')) {
+      const objDiv = document.getElementById('mainchat')
+      var bottom = false
+      if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+        bottom = true
+      }
+      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + text + '" style="width: 25%; height: auto;"></span><br>'
+      document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+      if (bottom) {
+       objDiv.scrollTop = objDiv.scrollHeight
+      }
+    } else {
+      const objDiv = document.getElementById('mainchat')
+      var bottom = false
+      if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+        bottom = true
+      }
+      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
+      document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+      if (bottom) {
+        objDiv.scrollTop = objDiv.scrollHeight
+      }
     }
   }
 })
@@ -58,21 +70,26 @@ socket.on('loadMessages', (loadBackData) => {
   const sendingStr = jsonData.messages
 
   const splitMessages = sendingStr.split('>')
-  var scounter = 0
   for (let messageI = 0; messageI < splitMessages.length; messageI++) {
-    scounter = scounter + 1
-    const splitMessage = splitMessages[messageI].split(';')
+    const splitMessage = splitMessages[messageI].split('?')
     const username = splitMessage[0]
     const message = splitMessage[1]
     const time = splitMessage[2]
     const id = splitMessage[3]
     const type = splitMessage[4]
 
-    if (type == 'mainRoom' && scounter <= 50) {
-      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span><br>'
-      document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-      const objDiv = document.getElementById('mainchat')
-      objDiv.scrollTop = objDiv.scrollHeight
+    if (type == 'mainRoom') {
+      if (message.includes('base64')) {
+        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + message + '" style="width: 25%; height: auto;"></span><br>'
+        document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+        const objDiv = document.getElementById('mainchat')
+        objDiv.scrollTop = objDiv.scrollHeight
+      } else {
+        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span><br>'
+        document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+        const objDiv = document.getElementById('mainchat')
+        objDiv.scrollTop = objDiv.scrollHeight
+      }
     }
   }
 })
@@ -121,3 +138,28 @@ document.addEventListener("keypress", function(event) {
    sendMessage()
   } 
 })
+
+var base64File = null
+
+function uploadMessage() {
+  const fileinput = document.getElementById('uploadfileid').files[0]
+
+  reader = new FileReader();
+
+  reader.onloadend = function () {
+    var b64 = reader.result
+    response = confirm('Are you sure you want to upload the file, ' + fileinput.name + '?')
+
+    if (response) {
+      const username = localStorage.getItem('checkUsername')
+      const password = localStorage.getItem('checkPassword')
+      const type = 'mainRoom'
+
+      const messageData = {text: b64, username: username, password: password, type: type}
+  
+      socket.emit('sendMessage', messageData)
+    }
+  }
+
+  reader.readAsDataURL(fileinput);
+}
