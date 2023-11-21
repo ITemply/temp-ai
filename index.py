@@ -22,18 +22,24 @@ enkey = os.environ['EN_KEY'].encode()
 
 # Functions
 
+authedUsers = []
+
 def checkUser(username, password):
-  find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
-  if find.json()[0]:
-    data = find.json()[0]
-    checkUsername = data['checkusername']
-    checkPassword = data['password']
-    if checkUsername == username.lower() and checkPassword == password:
-      return True
+  if username in authedUsers:
+    return True
+  else:
+    find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
+    if find.json()[0]:
+      data = find.json()[0]
+      checkUsername = data['checkusername']
+      checkPassword = data['password']
+      if checkUsername == username.lower() and checkPassword == password:
+        authedUsers.append(username)
+        return True
+      else:
+        return False
     else:
       return False
-  else:
-    return False
 
 def generateRoomId():
     letters = string.ascii_letters
