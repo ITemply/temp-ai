@@ -55,6 +55,26 @@ socket.on('clearCommand', (clearCommandData) => {
   }
 })
 
+socket.on('mutedList', (mutedListData) => {
+  const jsonData = JSON.parse(mutedListData)
+  const users = jsonData.messagetext
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + ' are muted.</span><br>'
+  document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+})
+
+socket.on('mutedUser', (mutedListData) => {
+  const jsonData = JSON.parse(mutedListData)
+  const users = jsonData.messagetext
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span><br>'
+  document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+})
+
+socket.on('commandList', (mutedListData) => {
+  const jsonData = JSON.parse(mutedListData)
+  const users = jsonData.messagetext
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span><br>'
+  document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+})
 
 socket.on('delMessage', (messageData) => {
   const jsonData = JSON.parse(messageData)
