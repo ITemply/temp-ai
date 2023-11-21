@@ -109,6 +109,9 @@ async function signIn() {
 function signOut() {
   localStorage.removeItem('checkUsername')
   localStorage.removeItem('checkPassword')
+  localStorage.removeItem('checkId')
+  localStorage.removeItem('sessionId')
+  localStorage.removeItem('sessionCreationTime')
 
   window.location.href = '/'
 }
