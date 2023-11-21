@@ -58,19 +58,36 @@ def checkPerms(username, password):
     return False
 
 def checkCommand(text):
-  commands = ['/clear']
+  commands = ['/clear', '/mute', '/unmute', '/muted', '/commands']
   for command in range(len(commands)):
     currentCommand = commands[command]
     if currentCommand in text:
       return True
-    else:
-      return False
+  return False
+
+mutedUsers = []
 
 def executeCommand(command, data):
   if command == '/clear':
     table = data[0]
-    executeSQL(f'DELETE FROM {table}')
     emit('clearCommand', '{"room": "' + table + '"}', broadcast=True)
+    executeSQL(f'DELETE FROM {table}')
+  elif command == '/mute':
+    user = data[0]
+    mutedUsers.append(user)
+  elif command == '/unmute':
+    user = data[0]
+    mutedUsers.remove(user)
+  elif command == '/muted':
+    sendingStr = ''
+    for entry in mutedUsers:
+      sendingStr = sendingStr + entry + ', '
+    messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + sendingStr + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "mutedList"}'
+    emit('mutedList', messageBackData)
+  elif command == '/commands':
+    sendingStr = '/clear;<chat> | /mute;<user> | /unmute;<user> | /muted; | /commands;'
+    messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + sendingStr + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "mutedList"}'
+    emit('commandList', messageBackData)
 
 def cleantext(text):
   outputString = re.sub('<[^<]+?>', '', text)
@@ -231,6 +248,11 @@ def sendMessage(messageData):
   password = bdecode(messageData['password'])
   messageType = messageData['type']
 
+  if username in mutedUsers:
+    messageBackData = '{"sendinguser": "NONE", "messagetext": "You are muted.", "messageid": "NONE", "messagetime": "NONE", "messagetype": "mutedUser"}'
+    emit('mutedUser', messageBackData)
+    return
+
   if messageType == 'mainRoom':
     if checkUser(username, password):
       messageId = getMessageId()
@@ -239,10 +261,9 @@ def sendMessage(messageData):
         tz_NY = pytz.timezone('America/New_York') 
         datetime_NY = datetime.now(tz_NY)
         currentTime = datetime_NY.strftime('%H:%M')
-        executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'mainRoom')")
-
         messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "mainRoom"}'
         emit('newMessage', messageBackData, broadcast=True)
+        executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'mainRoom')")
       else:
         if checkPerms(username, password):
           if ';' in newMessage:
@@ -257,10 +278,9 @@ def sendMessage(messageData):
           tz_NY = pytz.timezone('America/New_York') 
           datetime_NY = datetime.now(tz_NY)
           currentTime = datetime_NY.strftime('%H:%M')
-          executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'text')")
-
           messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
           emit('newMessage', messageBackData, broadcast=True)
+          executeSQL(f"INSERT INTO chats.mainRoom (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', 'text')")
     else:
       emit('response', 'Failed To Send')
   elif messageType == '':
@@ -273,10 +293,9 @@ def sendMessage(messageData):
         tz_NY = pytz.timezone('America/New_York') 
         datetime_NY = datetime.now(tz_NY)
         currentTime = datetime_NY.strftime('%H:%M')
-        executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', '{messageType}')")
-
         messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "' + messageType + '"}'
         emit('newMessage', messageBackData, broadcast=True)
+        executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', '{messageType}')")
       if checkPerms(username, password):
         if ';' in newMessage:
           commandSplit = newMessage.split(';')
@@ -290,10 +309,9 @@ def sendMessage(messageData):
         tz_NY = pytz.timezone('America/New_York') 
         datetime_NY = datetime.now(tz_NY)
         currentTime = datetime_NY.strftime('%H:%M')
-        executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', {messageType})")
-
         messageBackData = '{"sendinguser": "' + username + '", "messagetext": "' + newMessage + '", "messageid": "' + str(messageId) + '", "messagetime": "' + currentTime + '", "messagetype": "text"}'
         emit('newMessage', messageBackData, broadcast=True)
+        executeSQL(f"INSERT INTO chats.randomRoomChats (sendinguser, messagetext, messageid, messagetime, messagetype) VALUE ('{str(username)}', '{str(newMessage)}', {str(int(messageId))}, '{str(currentTime)}', {messageType})")
     else:
       emit('response', 'Failed To Send')
 
@@ -358,7 +376,6 @@ def joinRoom(joinRoomData):
       emit('joinRoom', '{"users": "' + loadinguserstr + '", "room": "' + roomid + '"}', broadcast=True)
     else:
       emit('notEnoughUsers', '{"userCount": "' + str(usercount) + '"}')
-
   except Exception as e:
     emit('failedToConnect', '{"reason": "Failed To Create Room"}')
     print(e)
@@ -369,8 +386,7 @@ def userLeaving(clientDisconnectingData):
   for room in range(len(openRooms)):
     if uid in openRooms[room]:
       roomid = openRooms[room][2]
-      popedroom = openRooms.pop(room)
-      print(popedroom)
+      openRooms.pop(room)
       emit('leaveRoom', '{"room": "' + roomid + '"}', broadcast=True)
 
 # Flask
