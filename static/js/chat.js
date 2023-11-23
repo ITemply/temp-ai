@@ -28,7 +28,7 @@ socket.on('newMessage', (messageData) => {
       if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
         bottom = true
       }
-      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + text + '" style="width: 25%; height: auto;"></span><br>'
+      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + text + '" style="width: 27.5%; height: auto;"></span><br>'
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
       if (bottom) {
        objDiv.scrollTop = objDiv.scrollHeight
@@ -100,7 +100,7 @@ socket.on('loadMessages', (loadBackData) => {
 
     if (type == 'mainRoom') {
       if (message.includes('base64')) {
-        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + message + '" style="width: 25%; height: auto;"></span><br>'
+        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + message + '" style="width: 27.5%; height: auto;"></span><br>'
         document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
         const objDiv = document.getElementById('mainchat')
         objDiv.scrollTop = objDiv.scrollHeight

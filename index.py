@@ -25,7 +25,12 @@ enkey = os.environ['EN_KEY'].encode()
 authedUsers = []
 
 def checkUser(username, password):
-  if username in authedUsers:
+  found = False
+  for entry in authedUsers:
+    if username in entry:
+      if username == entry[0] and password == entry[1]:
+        found = True
+  if found:
     return True
   else:
     find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
@@ -34,7 +39,7 @@ def checkUser(username, password):
       checkUsername = data['checkusername']
       checkPassword = data['password']
       if checkUsername == username.lower() and checkPassword == password:
-        authedUsers.append(username)
+        authedUsers.append([username, password])
         return True
       else:
         return False
@@ -46,7 +51,11 @@ def generateRoomId():
     random_string = ''.join(random.choice(letters) for i in range(25))
     return 'room-' + random_string
 
+authedMods = []
+
 def checkPerms(username, password):
+  if username in authedMods:
+    return True
   find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
   if find.json()[0]:
     data = find.json()[0]
@@ -55,6 +64,7 @@ def checkPerms(username, password):
     status = data['status']
     if checkUsername == username.lower() and checkPassword == password:
       if status == 'Admin' or status == 'Moderator':
+        authedMods.append(username)
         return True
       else:
         return False
