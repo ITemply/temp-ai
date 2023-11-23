@@ -113,6 +113,18 @@ socket.on('newMessage', (messageData) => {
         objDiv.scrollTop = objDiv.scrollHeight
       }
     }
+  } else if (type == 'announcement') {
+    audio.play()
+    const objDiv = document.getElementById('mainchat')
+    var bottom = false
+    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+      bottom = true
+    }
+    const newElement = '<span class="highlight-message" id="NONE"><center><h1><b>' + text + '</b></h1></center></span>'
+    document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+    if (bottom) {
+      objDiv.scrollTop = objDiv.scrollHeight
+    }
   }
 })
 
@@ -171,7 +183,7 @@ socket.on('joinRoom', (joiningRoomData) => {
 socket.on('inRoom', (inRoomData) => {
   const jsonData = JSON.parse(inRoomData)
   const myroom = jsonData.roomid
-  
+
   room = myroom
   inroom = 'true'
   document.getElementById('mainchat').innerHTML = ''

@@ -74,7 +74,7 @@ def checkPerms(username, password):
     return False
 
 def checkCommand(text):
-  commands = ['/clear', '/mute', '/unmute', '/muted', '/commands']
+  commands = ['/clear', '/mute', '/unmute', '/muted', '/commands', '/announce']
   for command in range(len(commands)):
     currentCommand = commands[command]
     if currentCommand in text:
@@ -101,9 +101,13 @@ def executeCommand(command, data):
     messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + sendingStr + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "mutedList"}'
     emit('mutedList', messageBackData)
   elif command == '/commands':
-    sendingStr = '/clear;<chat> | /mute;<user> | /unmute;<user> | /muted; | /commands;'
-    messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + sendingStr + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "mutedList"}'
+    sendingStr = '/clear;<chat> | /mute;<user> | /unmute;<user> | /muted; | /announce;<announcement> | /commands;'
+    messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + sendingStr + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "commandsList"}'
     emit('commandList', messageBackData)
+  elif command == '/announce':
+    announcement = data[0]
+    messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + announcement + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "announcement"}'
+    emit('newMessage', messageBackData, broadcast=True)
 
 def cleantext(text):
   outputString = re.sub('<[^<]+?>', '', text)

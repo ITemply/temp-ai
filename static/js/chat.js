@@ -62,6 +62,18 @@ socket.on('newMessage', (messageData) => {
         }
       }
     }
+  } else if (type == 'announcement') {
+    audio.play()
+    const objDiv = document.getElementById('mainchat')
+    var bottom = false
+    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+      bottom = true
+    }
+    const newElement = '<span class="highlight-message" id="NONE"><center><h1><b>' + text + '</b></h1></center></span>'
+    document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+    if (bottom) {
+      objDiv.scrollTop = objDiv.scrollHeight
+    }
   }
 })
 
