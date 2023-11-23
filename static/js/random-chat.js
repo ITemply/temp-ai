@@ -1,5 +1,8 @@
 const socket = io()
 
+var audio = new Audio('static/js/sounds/mixkit-gaming-lock-2848.wav')
+audio.volume = 0.2
+
 function makeid(length) {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -87,6 +90,7 @@ socket.on('newMessage', (messageData) => {
 
   if (type == room){
     if (text.includes('@'+ localStorage.getItem('checkUsername'))) {
+      audio.play()
       const objDiv = document.getElementById('mainchat')
       var bottom = false
       if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
@@ -151,7 +155,7 @@ socket.on('delMessage', (messageData) => {
 
 socket.on('joinRoom', (joiningRoomData) => {
   const jsonData = JSON.parse(joiningRoomData)
-  const myuid = localStorage.getItem('checkId')
+  const myuid = localStorage.getItem('sessionId')
   const users = jsonData.users
   const myroom = jsonData.room
 
@@ -162,6 +166,17 @@ socket.on('joinRoom', (joiningRoomData) => {
     const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: You have joined a chat! Connected to: ' + room + '</span>'
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
   }
+})
+
+socket.on('inRoom', (inRoomData) => {
+  const jsonData = JSON.parse(inRoomData)
+  const myroom = jsonData.roomid
+  
+  room = myroom
+  inroom = 'true'
+  document.getElementById('mainchat').innerHTML = ''
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: You have joined a chat! Connected to: ' + room + '</span>'
+  document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
 socket.on('leaveRoom', (leavingRoomData) => {

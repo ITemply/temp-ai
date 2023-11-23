@@ -366,11 +366,19 @@ def joinRoom(joinRoomData):
   try:
     usercount = 0
     openRoomCount = 0
+    userInRoom = False
+    roomid = ''
     for userid in range(len(lookingForRoom)):
       usercount = usercount + 1
-    for userid in range(len(openRooms)):
+    for room in range(len(openRooms)):
       openRoomCount = openRoomCount + 1
+      if uid in openRooms[room]:
+        roomid = openRooms[room][2]
+        emit('inRoom', '{"roomid": "' + roomid + '"}')
+        userInRoom = True
     if inroom == 'true':
+      pass
+    elif userInRoom:
       pass
     elif usercount >= 2:
       myid = uid
