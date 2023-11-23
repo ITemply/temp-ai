@@ -51,3 +51,20 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #555; 
 }
+
+@media only screen and (max-width: 500px) {
+    .mainchat {
+        position: inherit;
+        border-color: black;
+        border-width: 2px;
+        overflow-x: hidden;
+        border-style: solid;
+        margin: auto;
+        width: 465px;
+        height: 600px;
+    }
+
+    .mesasgeinput {
+        width: 455px;
+    }
+}

@@ -411,6 +411,7 @@ def userLeaving(clientDisconnectingData):
     if uid in openRooms[room]:
       roomid = openRooms[room][2]
       openRooms.pop(room)
+      time.sleep(1)
       emit('leaveRoom', '{"room": "' + roomid + '"}', broadcast=True)
 
 # Flask
