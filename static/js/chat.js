@@ -1,5 +1,8 @@
 const socket = io()
 
+var audio = new Audio('static/js/sounds/mixkit-gaming-lock-2848.wav')
+audio.volume = 0.2
+
 function logError(errorText) {
   let errorElement = document.getElementById('error')
   errorElement.innerHTML = errorText
@@ -28,21 +31,35 @@ socket.on('newMessage', (messageData) => {
       if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
         bottom = true
       }
-      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + text + '" style="width: 27.5%; height: auto;"></span><br>'
+      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + text + '" style="width: 25%; height: auto;"></span>'
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
       if (bottom) {
        objDiv.scrollTop = objDiv.scrollHeight
       }
     } else {
-      const objDiv = document.getElementById('mainchat')
-      var bottom = false
-      if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
-        bottom = true
-      }
-      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
-      document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-      if (bottom) {
-        objDiv.scrollTop = objDiv.scrollHeight
+      if (text.includes('@'+ localStorage.getItem('checkUsername'))) {
+        audio.play()
+        const objDiv = document.getElementById('mainchat')
+        var bottom = false
+        if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+          bottom = true
+        }
+        const newElement = '<span class="highlight-message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span>'
+        document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+        if (bottom) {
+          objDiv.scrollTop = objDiv.scrollHeight
+        }
+      } else {
+        const objDiv = document.getElementById('mainchat')
+        var bottom = false
+        if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+          bottom = true
+        }
+        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span>'
+        document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+        if (bottom) {
+          objDiv.scrollTop = objDiv.scrollHeight
+        }
       }
     }
   }
@@ -58,21 +75,21 @@ socket.on('clearCommand', (clearCommandData) => {
 socket.on('mutedList', (mutedListData) => {
   const jsonData = JSON.parse(mutedListData)
   const users = jsonData.messagetext
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + ' are muted.</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + ' are muted.</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
 socket.on('mutedUser', (mutedListData) => {
   const jsonData = JSON.parse(mutedListData)
   const users = jsonData.messagetext
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
 socket.on('commandList', (mutedListData) => {
   const jsonData = JSON.parse(mutedListData)
   const users = jsonData.messagetext
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
@@ -100,15 +117,40 @@ socket.on('loadMessages', (loadBackData) => {
 
     if (type == 'mainRoom') {
       if (message.includes('base64')) {
-        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + message + '" style="width: 27.5%; height: auto;"></span><br>'
-        document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
         const objDiv = document.getElementById('mainchat')
-        objDiv.scrollTop = objDiv.scrollHeight
+        var bottom = false
+        if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+          bottom = true
+        }
+        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: <img src="' + message + '" style="width: 25%; height: auto;"></span>'
+        document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+        if (bottom) {
+         objDiv.scrollTop = objDiv.scrollHeight
+        }
       } else {
-        const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span><br>'
-        document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-        const objDiv = document.getElementById('mainchat')
-        objDiv.scrollTop = objDiv.scrollHeight
+        if (message.includes('@'+ localStorage.getItem('checkUsername'))) {
+          const objDiv = document.getElementById('mainchat')
+          var bottom = false
+          if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+            bottom = true
+          }
+          const newElement = '<span class="highlight-message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span>'
+          document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+          if (bottom) {
+            objDiv.scrollTop = objDiv.scrollHeight
+          }
+        } else {
+          const objDiv = document.getElementById('mainchat')
+          var bottom = false
+          if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+            bottom = true
+          }
+          const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span>'
+          document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+          if (bottom) {
+            objDiv.scrollTop = objDiv.scrollHeight
+          }
+        }
       }
     }
   }

@@ -65,7 +65,7 @@ socket.on('notEnoughUsers', (backData) => {
   const jsonData = JSON.parse(backData)
   const userCount = jsonData.userCount
 
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Not enought users to make a random room. Current user waiting count, ' + userCount + ' user(s) active.</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Not enought users to make a random room. Current user waiting count, ' + userCount + ' user(s) active.</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
@@ -73,7 +73,7 @@ socket.on('failedToConnect', (backData) => {
   const jsonData = JSON.parse(backData)
   const userCount = jsonData.reason
 
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + userCount + '</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + userCount + '</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
@@ -86,15 +86,28 @@ socket.on('newMessage', (messageData) => {
   const type = jsonData.messagetype
 
   if (type == room){
-    const objDiv = document.getElementById('mainchat')
-    var bottom = false
-    if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
-      bottom = true
-    }
-    const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span><br>'
-    document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
-    if (bottom) {
-     objDiv.scrollTop = objDiv.scrollHeight
+    if (text.includes('@'+ localStorage.getItem('checkUsername'))) {
+      const objDiv = document.getElementById('mainchat')
+      var bottom = false
+      if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+        bottom = true
+      }
+      const newElement = '<span class="highlight-message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span>'
+      document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+      if (bottom) {
+        objDiv.scrollTop = objDiv.scrollHeight
+      }
+    } else {
+      const objDiv = document.getElementById('mainchat')
+      var bottom = false
+      if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
+        bottom = true
+      }
+      const newElement = '<span class="message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span>'
+      document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
+      if (bottom) {
+        objDiv.scrollTop = objDiv.scrollHeight
+      }
     }
   }
 })
@@ -109,21 +122,21 @@ socket.on('clearCommand', (clearCommandData) => {
 socket.on('mutedList', (mutedListData) => {
   const jsonData = JSON.parse(mutedListData)
   const users = jsonData.messagetext
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + ' are muted.</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + ' are muted.</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
 socket.on('mutedUser', (mutedListData) => {
   const jsonData = JSON.parse(mutedListData)
   const users = jsonData.messagetext
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
 socket.on('commandList', (mutedListData) => {
   const jsonData = JSON.parse(mutedListData)
   const users = jsonData.messagetext
-  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span><br>'
+  const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: ' + users + '</span>'
   document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
 })
 
@@ -146,7 +159,7 @@ socket.on('joinRoom', (joiningRoomData) => {
     room = myroom
     inroom = 'true'
     document.getElementById('mainchat').innerHTML = ''
-    const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: You have joined a chat! Connected to: ' + room + '</span><br>'
+    const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: You have joined a chat! Connected to: ' + room + '</span>'
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
   }
 })
@@ -157,7 +170,7 @@ socket.on('leaveRoom', (leavingRoomData) => {
 
   if (myroom == room) {
     setTimeout(function(){
-      const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Other user has skipped!</span><br>'
+      const newElement = '<span class="message" id="NotFound"><b>SERVER</b>: Other user has skipped!</span>'
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
     }, 1000);
     setTimeout(function(){
