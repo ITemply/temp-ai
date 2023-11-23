@@ -44,7 +44,7 @@ socket.on('newMessage', (messageData) => {
         if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
           bottom = true
         }
-        const newElement = '<span class="highlight-message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span>'
+        const newElement = '<div class="highlight-message"><span class="message" style="left: 0.5%;" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + text + '</span></div>'
         document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
         if (bottom) {
           objDiv.scrollTop = objDiv.scrollHeight
@@ -146,7 +146,7 @@ socket.on('loadMessages', (loadBackData) => {
           if (objDiv.scrollHeight - objDiv.scrollTop === objDiv.clientHeight) {
             bottom = true
           }
-          const newElement = '<span class="highlight-message" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span>'
+          const newElement = '<div class="highlight-message"><span class="message" style="left: 0.5%;" id="' + id + '">' + time + ' <b>' + username + '</b>: ' + message + '</span></div>'
           document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
           if (bottom) {
             objDiv.scrollTop = objDiv.scrollHeight

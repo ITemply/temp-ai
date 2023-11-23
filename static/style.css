@@ -23,7 +23,6 @@
 .highlight-message {
     display: block;
     position: relative;
-    left: 0.5%;
     background-color: rgb(224, 224, 224);
     width: 100%;
 }
