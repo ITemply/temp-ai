@@ -104,7 +104,7 @@ def executeCommand(command, data):
     messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + sendingStr + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "mutedList"}'
     emit('mutedList', messageBackData)
   elif command == '/commands':
-    sendingStr = '/clear;<chat> | /mute;<user> | /unmute;<user> | /muted; | /announce;<announcement> | /deluser;<username> | /commands;'
+    sendingStr = '/clear;<chat> | /mute;(user) | /unmute;(user) | /muted; | /announce;(announcement) | /deluser;(username) | /commands;'
     messageBackData = '{"sendinguser": "SERVER", "messagetext": "' + sendingStr + '", "messageid": "NONE", "messagetime": "NONE", "messagetype": "commandsList"}'
     emit('commandList', messageBackData)
   elif command == '/announce':
