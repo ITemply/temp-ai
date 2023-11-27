@@ -100,6 +100,8 @@ async function signIn() {
       logError('Invalid Username Or Password, enter a new username or password and try again.')
     } else if (information == 'UTP') {
       logError('Unable To Process Request, the server was unable to process your request properly, please try again.')
+    } else if (information == 'DEL') {
+      logError('Deleted Account, the account you tried to sign into is deleted.')
     }
   } catch (error) {
     console.error("Error:", error);

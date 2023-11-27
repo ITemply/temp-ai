@@ -16,6 +16,23 @@ socket.on('connect', () => {
   socket.emit('getMessages', getMessageData)
 })
 
+function signOut() {
+  localStorage.removeItem('checkUsername')
+  localStorage.removeItem('checkPassword')
+  localStorage.removeItem('checkId')
+  localStorage.removeItem('sessionId')
+  localStorage.removeItem('sessionCreationTime')
+}
+
+socket.on('accountDeleted', (accountDeletedData) => {
+  const jsonData = JSON.parse(accountDeletedData)
+  const user = jsonData.account
+  if (user == localStorage.getItem('checkUsername')) {
+    document.write('<center><h1>Account Deleted</h1><span>Your account has been deleted, you may create another but you can not use the same account.</span><br><br><input type="button" onclick="window.location.href = \'/signup\'" value="Sign Up"></input></center>')
+    signOut()
+  }
+})
+
 socket.on('newMessage', (messageData) => {
   const jsonData = JSON.parse(messageData)
   const username = jsonData.sendinguser
@@ -179,7 +196,7 @@ function checkLogin() {
       window.location.href = '/home'
     }
   } else {
-    if (location.includes('/home') || location.includes('/chat')) {
+    if (location.includes('/home') || location.includes('/chat') || location.includes('/random-chat')) {
       window.location.href = '/'
     }
   }

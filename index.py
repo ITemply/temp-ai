@@ -38,6 +38,9 @@ def checkUser(username, password):
       data = find.json()[0]
       checkUsername = data['checkusername']
       checkPassword = data['password']
+      status = data['status']
+      if status == 'Deleted':
+        return False
       if checkUsername == username.lower() and checkPassword == password:
         authedUsers.append([username, password])
         return True
@@ -114,7 +117,8 @@ def executeCommand(command, data):
       check = authedUsers[entry]
       if user in check:
         authedUsers.pop(entry)
-    executeSQL(f'DELETE FROM accounts.accountData WHERE chcekusername={user.lower()}')
+    find = executeSQL(f'UPDATE accounts.accountData SET status="Deleted" WHERE checkusername="{user.lower()}"')
+    emit('accountDeleted', '{"account": "' + user + '"}', broadcast=True)
     
 
 def cleantext(text):
@@ -223,6 +227,9 @@ def signin():
     find = executeSQL(f'SELECT * FROM accounts.accountData WHERE checkusername="{username.lower()}"')
     try:
       returnedJson = find.json()[0]
+      userStatus = returnedJson['status']
+      if userStatus == 'Deleted':
+        return '{"response": "DEL"}'
       userPass = returnedJson['password']
       usernameChcek = returnedJson['checkusername']
       id = returnedJson['userid']
