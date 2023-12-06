@@ -117,6 +117,8 @@ socket.on('newMessage', (messageData) => {
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
       if (bottom) {
         objDiv.scrollTop = objDiv.scrollHeight
+      } else {
+        logError('New Messages')
       }
     } else {
       const objDiv = document.getElementById('mainchat')
@@ -128,6 +130,8 @@ socket.on('newMessage', (messageData) => {
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
       if (bottom) {
         objDiv.scrollTop = objDiv.scrollHeight
+      } else {
+        logError('New Messages')
       }
     }
   } else if (type == 'announcement') {
@@ -141,8 +145,10 @@ socket.on('newMessage', (messageData) => {
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
     if (bottom) {
       objDiv.scrollTop = objDiv.scrollHeight
+    } else {
+      logError('New Messages')
     }
-  }
+  } 
 })
 
 socket.on('clearCommand', (clearCommandData) => {

@@ -52,6 +52,8 @@ socket.on('newMessage', (messageData) => {
       document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
       if (bottom) {
        objDiv.scrollTop = objDiv.scrollHeight
+      } else {
+        logError('New Messages')
       }
     } else {
       if (text.includes('@'+ localStorage.getItem('checkUsername'))) {
@@ -65,6 +67,8 @@ socket.on('newMessage', (messageData) => {
         document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
         if (bottom) {
           objDiv.scrollTop = objDiv.scrollHeight
+        } else {
+          logError('New Messages')
         }
       } else {
         const objDiv = document.getElementById('mainchat')
@@ -76,6 +80,8 @@ socket.on('newMessage', (messageData) => {
         document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
         if (bottom) {
           objDiv.scrollTop = objDiv.scrollHeight
+        } else {
+          logError('New Messages')
         }
       }
     }
@@ -90,6 +96,8 @@ socket.on('newMessage', (messageData) => {
     document.getElementById('mainchat').innerHTML = document.getElementById('mainchat').innerHTML + newElement
     if (bottom) {
       objDiv.scrollTop = objDiv.scrollHeight
+    } else {
+      logError('New Message, a new message has arrived.')
     }
   }
 })
