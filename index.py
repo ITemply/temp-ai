@@ -271,15 +271,6 @@ def randomchat():
   else:
     return '{"response": "Request Type Not Supported"}'
 
-@app.route('/voice', methods=['GET', 'POST'])
-def voice():
-  if request.method == 'GET':
-    return render_template('voice.html', async_mode=socketio.async_mode)
-  elif request.method == 'POST':
-    return '{"response": "Posted"}'
-  else:
-    return '{"response": "Request Type Not Supported"}'
-
 # Socket IO
 
 openRooms = []
