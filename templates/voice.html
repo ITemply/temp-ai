@@ -15,16 +15,13 @@
 <body>
   <center>
     <h1>Random Call</h1>
-    <p>main chat that everyone has access to</p>
+    <p>a random call with a random person</p>
   </center>
-  <div class="mainchat" id="mainchat">
+  <div class="mainchat" id="voice">
   </div>
   <center>
     <br>
-    <input type="text" id="inputtextchat" placeholder="your message here..." class="mesasgeinput">
-    <input type="button" value="Send Message" onclick="sendMessage()" class="btn">
-    <input type="button" value="Upload Image" onclick="document.getElementById('uploadfileid').click()" class="btn">
-    <input type="file" id="uploadfileid" accept="image/*" onchange="uploadMessage()" hidden>
+    <input type="button" value="Skip User" onclick="skipUser()" class="btn">
     <br><br>
     <span class='error' id="error"></span>
   </center>
