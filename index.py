@@ -24,6 +24,8 @@ enkey = os.environ['EN_KEY'].encode()
 
 authedUsers = []
 
+# SQL Operations are depricated due to SQL host being down. 
+
 def checkUser(username, password):
   found = False
   for entry in authedUsers:
